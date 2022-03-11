@@ -55,11 +55,17 @@ end
 
 %% 获取全部折痕角
 [Angle.Sphere{5}{16},Angle.Adjacent{5}{16}] = getSphereAngleCell(model.state{5}{16},model.corner{5}{16});
+[Angle.Sphere{7}{12},Angle.Adjacent{7}{12}] = getSphereAngleCell(model.state{7}{12},model.corner{7}{12});
 % 示例
-export('test','ASpB1',Angle.Sphere{5}{16}.Bi{1},cta_in,'sovleCorner5_16')
-export('test','AAdB1',Angle.Adjacent{5}{16}.Bi,cta_in,'AAdBi')
+export('test','ASpB1712',Angle.Sphere{7}{12}.Bi{1},cta_in,'sovleCorner5_16')
+export('test','ASpO1',Angle.Sphere{7}{12}.Oi{2},cta_in,'sovleCorner5_16')
 
-export('test','ASpO1',Angle.Sphere{5}{16}.Oi{1},cta_in,'sovleCorner5_16')
+export_AllSphere('712',Angle.Sphere{7}{12},cta_in)
+
+%% 获取全部体积计算
+[Vi,Vi_C] = getEachV_2(state);
+export_array('test','Vi',Vi,cta_in,'Vi')
+
 %% 绘制 折痕转角
 drawAllCorner(cta_in,model.corner{4}{11})
 %转角 180-处理
@@ -78,6 +84,9 @@ P_Oset_radius = draw_each_r(model.state{7}{12},cta_in,'-*');
 [P_Aset_radius_C{7}{14}] = getEachR_Ai(model.state{7}{14});
 %% 绘制 V/a^3
 V_a3=getEachV(model.state{5}{16});
+
+
+
 
 %% 得到相邻列之间的折痕转角
 [res_corner,res_corner_C] =get2PlaneAngleCell(model.state{4}{11});

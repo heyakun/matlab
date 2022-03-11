@@ -1,5 +1,10 @@
 function [P_Oset_radius,P_Oset_radius_C] = getEachR(state)
 %GETEACHR 此处显示有关此函数的摘要
+%@param{struct{ .O .A .B} }
+%@return{ cell(1* ?) } 
+
+% state.O  1*10cell{1*7cell}- >  1*7cell{1*10sym}
+
 %   此处显示详细说明
 a= 20;
 O_count = length(state.O{1});
@@ -9,7 +14,7 @@ P_Oset=cell(1,O_count);
 P_Oset_radius = cell(1,O_count);
 P_Oset_radius_C = cell(1,O_count);
 frames = length(state.O);
-for cur_pos = 1:length(state.O{1})  
+for cur_pos = 1:O_count 
     for num = 1:frames
         if (mod(cur_pos,2)==1)
            P_Oset{cur_pos}{num}= hanle_Point_Ry(state.O{num}{cur_pos}{1},col_num);
