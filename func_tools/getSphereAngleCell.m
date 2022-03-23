@@ -15,9 +15,9 @@ function [Sphere,Adjacent] = getSphereAngleCell(modelState,modelCorner)
          %奇数
          Sphere.Bi{mm}{1} = all_angle4_cell{mm};
          i=i+1;
-         Sphere.Bi{mm}{2} = modelCorner{i};
+         Sphere.Bi{mm}{2} =180- modelCorner{i};
          i=i+1;
-         Sphere.Bi{mm}{3} = modelCorner{i};
+         Sphere.Bi{mm}{3} =180- modelCorner{i};
          Sphere.Bi{mm}{4} = all_angle_adj_cell{mm};
          if(mm == m)
              %奇数行需要在最后补充一个4-1=3个角

@@ -7,7 +7,7 @@ function [] = useAxios(vector)
     set(gca, 'YAxisLocation', 'origin');
     grid on
     axis equal
-    axis([-200 200 -250 50 -200 200])
+    axis([-200 200 -250 50 -200 0])
     view(vector)
 end
 

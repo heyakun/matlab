@@ -11,10 +11,10 @@ O_count = length(state.O{1});
 col_num = length(state.O{1}{1});
 
 P_Oset=cell(1,O_count);
-P_Oset_radius = cell(1,O_count);
-P_Oset_radius_C = cell(1,O_count);
+P_Oset_radius = cell(1,O_count-1);
+P_Oset_radius_C = cell(1,O_count-1);
 frames = length(state.O);
-for cur_pos = 1:O_count 
+for cur_pos = 1:O_count -1
     for num = 1:frames
         if (mod(cur_pos,2)==1)
            P_Oset{cur_pos}{num}= hanle_Point_Ry(state.O{num}{cur_pos}{1},col_num);
