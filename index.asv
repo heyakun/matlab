@@ -17,6 +17,13 @@ cta_in = 9/20*pi-0.4*pi*t;
 cta_in2 = rad2deg( cta_in');
 load('data_0221')
 state = model.state{5}{16};
+%% 创建三因子模型
+[model3.state{3}{8}{20}{15},model3.corner{3}{8}{20}{15}] = createModel(3,8,20,15,frames);
+[model3.state{3}{8}{20}{15},model3.corner{3}{8}{20}{15}] = createModel(3,8,20,15,frames);
+
+modelState = model3.state{3}{8}{20}{15};
+drawModel(modelState);
+
 %% 创建模型
 [state,CornerCell] = createModel(m,n,a,p,frames);
 [model.state{3}{9},model.corner{3}{9}] = createModel(3,9,a,p,frames);
