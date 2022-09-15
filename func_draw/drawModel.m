@@ -19,10 +19,12 @@ F = 1:n;
 %临时不画-顶部多边形
 patch('Faces',F,'Vertices',arr,'FaceColor',[0.3010 0.7450 0.9330])
 colorbar
-useAxios([0 0 1])
-    
+
+useAxios([0 0 1])%正视图
+% useAxios([0 1 0])%俯视图
+% useAxios([0 1 -1])%顶口视图
     col_top=[0.9290 0.6940 0.1250];
-%     临时不画-顶部三角形
+% %    临时不画-顶部三角形
     for i =1:n
         if(i == 1)
             point3ToFace(A1_arr(i,:),O0_arr(i,:),O0_arr(n,:),col_top)
@@ -45,11 +47,12 @@ useAxios([0 0 1])
  
     Blue=[0.3010 0.7450 0.9330];%蓝色
     BarBlue = [154, 187, 243]/255;
-    BarOrange = [255, 255, 162]/255;
+    BarOrange = [236, 177, 32]/255;
     BarPurple = [194, 178, 214]/255;
     BarLightBlue = [182, 228, 235]/255;
-     OddColor =  BarLightBlue;
-     EvenColor = BarLightBlue;
+    
+     OddColor =  BarBlue;
+     EvenColor = BarOrange;
     %临时白色
 %     col = [1 1 1];
     face_array_start(O1_s,B1_s,A1_s,n,OddColor)

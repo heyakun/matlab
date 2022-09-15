@@ -1,4 +1,5 @@
-addpath(genpath('func_tool'))
+% addpath(genpath('func_tool'))
+% addpath(genpath('func_auto'))
 %% 前置数据
 frames=10;
 t = linspace(0,1,frames);     
@@ -8,13 +9,25 @@ cta_in = 9/20*pi-0.4*pi*t;
 %cta_in2 用于将Cta_in弧度制转角度
 cta_in2 = rad2deg( cta_in');
 
-[realModelState,realModelCorner] = createModel(5,16,40,30,10);
-state = realModelState;
-
+%折纸模型
+[state,~] = createModel(m,n,a,p,frames);
+%实物模型
+% [realModelState,realModelCorner] = createModel(5,16,40,30,10);
+% state = realModelState;
+%%
 t_r = 2.4;
 t_c = 1.6;
+tr = (0:0.1:t_r)';
+tc = (t_r:0.1:t_r+t_c)';
 % cta_in  对 t 的 sym表达式
-[ cta_T_rec,cta_T_con ] = calc_S(state,cta_in2,t_r,t_c);
+% [ cta_T_rec,cta_T_con ] = calc_S(state,cta_in2,t_r,t_c);
+%% auto_flow还不完善 
+% 水母为oblate型，细度比区间【】对应的θin的区间为
+oblate = [49 , 9];
+prolate =[70 , 49];
+% 后四个在动力学计算时是非必要的，是用来绘制细度比随t曲线的
+[ cta_T_rec,cta_T_con,res_FR_r,tr,res_FR_c,tc ] = auto_flow(state,cta_in2,t_r,t_c,oblate);
+%% 算一下 细度比
 
 %% 除t y以外，其他参数
 %{
@@ -55,8 +68,6 @@ if u<0
     c_bell = 1.17;
 end
 
-
-
 参数3  A = α*ρwater*V*(?U/?t)
 
 α = (h_最大半径处/r_maxR)^(-1.4)
@@ -87,6 +98,15 @@ tspan = [0.1 4*10];
 y0 = [0 0];
 %%
 [res_t,res_y] = ode113(@(t,y) odefcn(t,y,Config), tspan, y0);
+
+% 第一条线是位移
 % plot(res_t,res_y(:,1))
-plot(res_t,res_y(:,2))
-%%
+% 第二条线是速度
+% plot(res_t,res_y(:,2))
+% 两条合并
+plot(res_t,res_y)
+
+%% 需要出图的是
+% 1.速度，位移 --- 时间t
+% 2.推进力T,阻力D ----时间t
+[D_list,T_list,] = calc_D(res_t,res_y,Config);

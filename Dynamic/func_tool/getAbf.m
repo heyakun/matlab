@@ -12,8 +12,8 @@ R_max_f= getFitFunc2(cta_in2',R_max,2);
 
 H_mid = getH_IndexOf(state,4);
 H_mid_f = getFitFunc2(cta_in2',H_mid,2);
-Alpha_rec = (H_mid_f(cta_T_rec)/R_max_f(cta_T_rec))^(-1.4);
-Alpha_con = (H_mid_f(cta_T_con)/R_max_f(cta_T_con))^(-1.4);
+Alpha_rec = (H_mid_f(cta_T_rec)/R_max_f(cta_T_rec))^(1.4);
+Alpha_con = (H_mid_f(cta_T_con)/R_max_f(cta_T_con))^(1.4);
 
 A_before_rec = Alpha_rec * Ro_water * Vi_T_rec;
 A_before_con = Alpha_con * Ro_water * Vi_T_con;

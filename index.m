@@ -1,20 +1,23 @@
-addpath('func_tools')
-addpath('public_tools')
-addpath('func_model')
+addpath(genpath('func_tools'))
+addpath(genpath('public_tools'))
+addpath(genpath('func_model'))
 addpath('func_draw')
 addpath('func_handle')
 addpath('func_export')
-addpath('func_calc')
+addpath(genpath('func_calc'))
+addpath(genpath('func_solveEq'))
+addpath(genpath('Dynamic'))
+addpath(genpath('func_auto'))
 global a p n m frames
 m = 5;
 n = 16;
 a = 20;
 p = 15;
 frames = 10;
-t = linspace(0,1,frames);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+t = linspace(0,1,frames);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
 cta_in = 9/20*pi-0.4*pi*t;
 %cta_in2 用于将Cta_in弧度制转角度
-cta_in2 = rad2deg( cta_in');
+cta_in2 = rad2deg(cta_in');
 load('data_0221')
 state = model.state{5}{16};
 %% 创建三因子模型
@@ -30,6 +33,7 @@ model3 = drawModel(modelState);
 [model.state{4}{12},model.corner{4}{12}] = createModel(4,12,a,p,frames);
 [model.state{5}{12},model.corner{5}{12}] = createModel(5,12,a,p,frames);
 [model.state{6}{13},model.corner{6}{13}] = createModel(6,13,a,p,frames);
+[model.state{7}{12},model.corner{7}{12}] = createModel(7,12,a,p,frames);
 [model.state{7}{14},model.corner{7}{14}] = createModel(7,14,a,p,frames);
 [model.state{8}{17},model.corner{8}{17}] = createModel(8,17,a,p,frames);
 
@@ -136,10 +140,55 @@ end
 %%
 [~,func_ROi_6_sym] = getFitFunc2(cta_in2',ROi{6},2);
 [~,func_H_o5_sym] =   getFitFunc2(cta_in2',H_o5,2);
-
-
-
-
+%% 拟合细度比
+fineness = [2.67607
+1.8591
+1.43589
+1.16696
+0.97264
+0.81915
+0.69014
+0.57709
+0.47537
+0.38236]; 
+theta_in =[81
+73
+65
+57
+49
+41
+33
+25
+17
+9];
+% [~,func_finess_sym] =   getFitFunc2(theta_in,fineness,2);
+% func_finess_sym = 0.00048935*x^2 - 0.016612*x + 0.60369;
+[FR_by_thetaIn_func,func_finess_sym] =   getFitFunc2(theta_in,fineness,4);
+%% 拟合特征体积
+V_a3 = [16.00275
+25.263875
+35.169375
+44.8375
+53.586
+60.92775
+66.554125
+70.2985
+72.094375
+71.9235
+];
+theta_in =[81
+73
+65
+57
+49
+41
+33
+25
+17
+9];
+[~,func_finess_sym] =   getFitFunc2(theta_in,V_a3,3);
+% 三次拟合
+% 0.00011298*x^3 - 0.025635*x^2 + 0.69725*x + 67.387 
 %% 绘制 折痕转角
 drawAllCorner(cta_in,model.corner{4}{11})
 %转角 180-处理
@@ -147,7 +196,8 @@ res_cell = hanle_pi_corner(model.corner{5}{16});
 %导出
 export('test','model7_14',res_cell,cta_in,'sovleCorner5_16')
 %% 绘制 模型
-drawModel(state);
+drawModel(model.state{7}{12});
+drawModel(model.state{7}{14});
 drawModel(model.para{5}{16}{20}{18});
 %% 绘制 H/a
 [H_a]=draw_each_H(model.state{5}{16},cta_in,'-s');
@@ -293,3 +343,99 @@ xlim([3 5])
 xticks([3 4 5])
 ylabel('Rv')
 legend('100%','80%','70%','60%','Location','North')
+%% 解方程
+syms x
+f_fit = 5.5354e-9*x^5 - 9.8595e-7*x^4 + 0.000067717*x^3 - 0.0020577*x^2 + 0.039223*x + 0.15106;
+f1 = f_fit-1.54;
+f1 = matlabFunction(f1);
+res1 = fsolve(f1,45);
+res1
+%% 20帧序列
+xx = [  89.100000000000009
+  84.457894736842121
+  79.815789473684220
+  75.173684210526318
+  70.531578947368416
+  65.889473684210529
+  61.247368421052634
+  56.605263157894733
+  51.963157894736845
+  47.321052631578944
+  42.678947368421049
+  38.036842105263155
+  33.394736842105260
+  28.752631578947362
+  24.110526315789471
+  19.468421052631577
+  14.826315789473686
+  10.184210526315780
+   5.542105263157888
+   0.900000000000000]
+%% 阶段1 收集θp的值：执行部件的转角范围(待抽离成函数)
+%收集A（1,0）的变化的全部集合
+%向量1：O(1,0)和O(1,n)的中点到0,0,0的向量(使用y[0,1,0]作为Y1)
+%向量2：O(1,0)和O(1,n)的中点到A(1,0)的向量
+%旋转轴：（1,0,0）
+%求解公式
+%Y2=  Y1*cosθ+(A×Y1)sinθ+A(A?Y2)(1-cosθ)
+
+%获取O中点和向量1
+O_1_0 = state.O{1}{1}{1};
+O_1_n = state.O{1}{1}{n};
+O_c = [0;0;O_1_0(3)];
+%Y1 = -O_c/norm(O_c);
+Y1 = [0;1;0];
+%旋转轴
+Axis = [1;0;0]; 
+%获取A系列的点和向量2:Y2_i
+A_out = cell(1,frames);
+Y2_i = cell(1,frames);
+res_p = zeros(frames,1);
+for Ai=1:frames
+    A_out{Ai} = state.A{Ai}{1}{1};
+    Y2_i{Ai} = (A_out{Ai}-O_c)/norm(A_out{Ai}-O_c);
+end
+%% 阶段二：求θp并且拟合θp关于θin的表达式，
+Ai=1;
+theta_p=zeros(frames,1);
+for Ai=1:frames
+    theta_p(Ai)= get2PlaneCorner(Y1,Y2_i{Ai},Axis);
+end
+[theta_p_func,theta_p_sym] =getFitFunc2(cta_in2,theta_p,1);
+%% 阶段三：确定L和h,和θp的范围，确定线长的范围
+%对于oblate型：θp范围[93.98 -> 48.58]
+%Slen_o的实例结果[65.813 , 37.024]
+theta_p_o_b =  theta_p_func(49);
+theta_p_o_e =  theta_p_func(9);
+%S^2 = L^2+ h^2+2*L*h*cosd(θp)
+L = 45;
+h = 45;
+S_o_b = sqrt(L^2+ h^2-2*L*h*cosd(theta_p_o_b));
+S_o_e = sqrt(L^2+ h^2-2*L*h*cosd(theta_p_o_e));
+Slen_o = [S_o_b,S_o_e];
+%% 阶段三： 已知tr ,tc 计算 kr, kc ，拿到线长S在0~tr tr~ T序列
+t_r = 2.4;
+t_c = 1.6;
+% 序列写在函数外
+tr = (0:0.1:t_r)';
+tc = (t_r:0.1:t_r+t_c)';
+
+[S_t_r,S_t_c] = calc_S_by_t(Slen_o,t_r,t_c);
+
+%% 阶段四： 已知线长S(t)的序列,反解θp序列->θin->FR
+[theta_p_r] = solve_St_to_thetaP(S_t_r,L,h);
+[theta_p_c] = solve_St_to_thetaP(S_t_c,L,h);
+
+%得到θp 反解θin
+[theta_in_r] = solve_ThetaP_to_in(theta_p_r,theta_p_sym);
+[theta_in_c] = solve_ThetaP_to_in(theta_p_c,theta_p_sym);
+% θin 对 t 二次拟合一次 得到θin 对 t sym表达式
+[ ~,theta_in_by_tr_sym] = getFitFunc2(tr,theta_in_r,2);
+[ ~,theta_in_by_tc_sym] = getFitFunc2(tc,theta_in_c,2);
+
+%得到θin 反解FR
+[res_FR_r] = solve_ThetaIn_to_FR(theta_in_r,FR_by_thetaIn_func);
+[res_FR_c] = solve_ThetaIn_to_FR(theta_in_c,FR_by_thetaIn_func);
+%% 阶段5： 可以绘制 FR 在 一个周期的变化曲线
+
+

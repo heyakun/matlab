@@ -3,7 +3,8 @@ function [res_cata_vpa] = get2PlaneCorner(v1,v2,A)
 % 此处显示详细说明
 %参数 v1 v2 分别是两个面的法向量
 %参数 A 是 旋转轴
-
+%函数handle_v1Byv2Rotate 得到的是一个方程，temp_v是列向量？
+%如果是列向量与v2相减会
 syms cta
 
 temp_v = handle_v1Byv2Rotate(v1,A,cta);
